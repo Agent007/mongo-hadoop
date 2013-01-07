@@ -39,6 +39,10 @@ public class MongoStorage extends StoreFunc implements StoreMetadata {
     // Pig specific settings
     static final String PIG_OUTPUT_SCHEMA = "mongo.pig.output.schema";
     static final String PIG_OUTPUT_SCHEMA_UDF_CONTEXT = "mongo.pig.output.schema.udf_context";
+
+    // Escape name that starts with _
+    static final String ESC_UNDERSCORE_PREFIX = "u_";
+
     protected ResourceSchema schema = null;
     private final MongoStorageOptions options;
 
@@ -98,9 +102,19 @@ public class MongoStorage extends StoreFunc implements StoreMetadata {
                             ResourceSchema.ResourceFieldSchema field,
                             Object d) throws IOException {
 
+        String fieldName = field.getName();
+        /*
+         * unescape field that starts with "u_" to the original field name
+	 * for instance u__id will be rewritten as _id
+	 */
+
+	if (fieldName.startsWith(MongoStorage.ESC_UNDERSCORE_PREFIX)) {
+            fieldName = fieldName.substring(MongoStorage.ESC_UNDERSCORE_PREFIX.length());
+	}
+
         // If the field is missing or the value is null, write a null
         if (d == null) {
-            builder.add( field.getName(), d );
+            builder.add(fieldName, d );
             return;
         }
 
@@ -109,27 +123,27 @@ public class MongoStorage extends StoreFunc implements StoreMetadata {
         // Based on the field's type, write it out
         switch (field.getType()) {
             case DataType.INTEGER:
-                builder.add( field.getName(), (Integer)d );
+                builder.add( fieldName, (Integer)d );
                 return;
 
             case DataType.LONG:
-                builder.add( field.getName(), (Long)d );
+                builder.add( fieldName, (Long)d );
                 return;
 
             case DataType.FLOAT:
-                builder.add( field.getName(), (Float)d );
+                builder.add( fieldName, (Float)d );
                 return;
 
             case DataType.DOUBLE:
-                builder.add( field.getName(), (Double)d );
+                builder.add( fieldName, (Double)d );
                 return;
 
             case DataType.BYTEARRAY:
-                builder.add( field.getName(), d.toString() );
+                builder.add( fieldName, d.toString() );
                 return;
 
             case DataType.CHARARRAY:
-                builder.add( field.getName(), (String)d );
+                builder.add( fieldName, (String)d );
                 return;
 
             // Given a TUPLE, create a Map so BSONEncoder will eat it
@@ -137,14 +151,14 @@ public class MongoStorage extends StoreFunc implements StoreMetadata {
                 if (s == null) {
                     throw new IOException("Schemas must be fully specified to use "
                             + "this storage function.  No schema found for field " +
-                            field.getName());
+                            fieldName);
                 }
                 ResourceSchema.ResourceFieldSchema[] fs = s.getFields();
                 LinkedHashMap m = new java.util.LinkedHashMap();
                 for (int j = 0; j < fs.length; j++) {
                     m.put(fs[j].getName(), ((Tuple) d).get(j));
                 }
-                builder.add( field.getName(), (Map)m );
+                builder.add( fieldName, (Map)m );
                 return;
 
             // Given a BAG, create an Array so BSONEnconder will eat it.
@@ -152,7 +166,7 @@ public class MongoStorage extends StoreFunc implements StoreMetadata {
                 if (s == null) {
                     throw new IOException("Schemas must be fully specified to use "
                             + "this storage function.  No schema found for field " +
-                            field.getName());
+                            fieldName);
                 }
                 fs = s.getFields();
                 if (fs.length != 1 || fs[0].getType() != DataType.TUPLE) {
@@ -164,7 +178,7 @@ public class MongoStorage extends StoreFunc implements StoreMetadata {
                 if (s == null) {
                     throw new IOException("Schemas must be fully specified to use "
                             + "this storage function.  No schema found for field " +
-                            field.getName());
+                            fieldName);
                 }
                 fs = s.getFields();
 
@@ -177,7 +191,7 @@ public class MongoStorage extends StoreFunc implements StoreMetadata {
                     a.add(ma);
                 }
 
-                builder.add( field.getName(), a);
+                builder.add( fieldName, a);
                 return;
             case DataType.MAP:
                 Map map = (Map) d;

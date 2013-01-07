@@ -184,7 +184,17 @@ public class MongoLoader extends LoadFunc implements LoadMetadata {
 		Tuple t = tupleFactory.newTuple(fields.length);
 		
 		for(int i = 0; i < fields.length; i++) {
-			t.set(i, readField(val.get(fields[i].getName()), fields[i]));
+			/* handle the case where the field starts with _
+			 * since pig does not want a field to start with _
+			 * simply prefix the field name with "u_"
+			 * If the name of the field is "_id", simply use
+			 * in your script u__id and we will translate it to _id
+			 */ 
+			if (fields[i].getName().startsWith(MongoStorage.ESC_UNDERSCORE_PREFIX)) {
+			    t.set(i, readField(val.get(fields[i].getName().substring(MongoStorage.ESC_UNDERSCORE_PREFIX.length())), fields[i]));
+			} else {
+			    t.set(i, readField(val.get(fields[i].getName()), fields[i]));
+			}
 		}
 
 		return t;
