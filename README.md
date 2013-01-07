@@ -49,4 +49,7 @@ Updated the mongodb hadoop pig adaptor so one can use field names that starts
 with an underscore (e.g., `_id`). Pig Latin does not allow to use underscore as
 the first character of a field. In order to use mongodb fields starting with
 an underscore, just prefix the field name with `u_`, so `_id` becomes `u__id`.
-When the field is stored in mongodb, we remove the `u_` prefix.
+When the field is stored in mongodb, we remove the `u_` prefix. Please note
+that it is a simple fix and so the code is not optimized. To build the mongo
+hadoop pig package type: ./sbt mongo-hadoop-pig/package
+

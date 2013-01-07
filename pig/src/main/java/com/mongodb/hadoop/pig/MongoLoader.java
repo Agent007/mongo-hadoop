@@ -192,8 +192,8 @@ public class MongoLoader extends LoadFunc implements LoadMetadata {
 			 * We test if it starts with u__ and if it does we
 			 * remove the u_
 			 */ 
-			if (fields[i].getName().startsWith(MongoStorage.ESC_UNDERSCORE_PREFIX + "_")) {
-			    t.set(i, readField(val.get(fields[i].getName().substring(MongoStorage.ESC_UNDERSCORE_PREFIX.length())), fields[i]));
+			if (fields[i].getName().startsWith(MongoStorage.ESC_UNDERSCORE_PREFIX)) {
+			    t.set(i, readField(val.get(fields[i].getName().substring(MongoStorage.ESC_UNDERSCORE_PREFIX.length() - 1)), fields[i]));
 			} else {
 			    t.set(i, readField(val.get(fields[i].getName()), fields[i]));
 			}

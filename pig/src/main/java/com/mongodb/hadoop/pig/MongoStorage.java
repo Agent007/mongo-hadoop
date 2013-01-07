@@ -41,7 +41,7 @@ public class MongoStorage extends StoreFunc implements StoreMetadata {
     static final String PIG_OUTPUT_SCHEMA_UDF_CONTEXT = "mongo.pig.output.schema.udf_context";
 
     // Escape name that starts with _
-    static final String ESC_UNDERSCORE_PREFIX = "u_";
+    static final String ESC_UNDERSCORE_PREFIX = "u__";
 
     protected ResourceSchema schema = null;
     private final MongoStorageOptions options;
@@ -108,8 +108,8 @@ public class MongoStorage extends StoreFunc implements StoreMetadata {
 	 * for instance u__id will be rewritten as _id
 	 */
 
-	if (fieldName.startsWith(MongoStorage.ESC_UNDERSCORE_PREFIX + "_")) {
-            fieldName = fieldName.substring(MongoStorage.ESC_UNDERSCORE_PREFIX.length());
+	if (fieldName.startsWith(MongoStorage.ESC_UNDERSCORE_PREFIX)) {
+            fieldName = fieldName.substring(MongoStorage.ESC_UNDERSCORE_PREFIX.length() - 1);
 	}
 
         // If the field is missing or the value is null, write a null
