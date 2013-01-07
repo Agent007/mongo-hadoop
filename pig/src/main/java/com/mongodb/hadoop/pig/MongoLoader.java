@@ -189,8 +189,10 @@ public class MongoLoader extends LoadFunc implements LoadMetadata {
 			 * simply prefix the field name with "u_"
 			 * If the name of the field is "_id", simply use
 			 * in your script u__id and we will translate it to _id
+			 * We test if it starts with u__ and if it does we
+			 * remove the u_
 			 */ 
-			if (fields[i].getName().startsWith(MongoStorage.ESC_UNDERSCORE_PREFIX)) {
+			if (fields[i].getName().startsWith(MongoStorage.ESC_UNDERSCORE_PREFIX + "_")) {
 			    t.set(i, readField(val.get(fields[i].getName().substring(MongoStorage.ESC_UNDERSCORE_PREFIX.length())), fields[i]));
 			} else {
 			    t.set(i, readField(val.get(fields[i].getName()), fields[i]));

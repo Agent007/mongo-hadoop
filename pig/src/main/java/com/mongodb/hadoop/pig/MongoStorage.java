@@ -104,11 +104,11 @@ public class MongoStorage extends StoreFunc implements StoreMetadata {
 
         String fieldName = field.getName();
         /*
-         * unescape field that starts with "u_" to the original field name
+         * unescape field that starts with "u__" to the original field name
 	 * for instance u__id will be rewritten as _id
 	 */
 
-	if (fieldName.startsWith(MongoStorage.ESC_UNDERSCORE_PREFIX)) {
+	if (fieldName.startsWith(MongoStorage.ESC_UNDERSCORE_PREFIX + "_")) {
             fieldName = fieldName.substring(MongoStorage.ESC_UNDERSCORE_PREFIX.length());
 	}
 
