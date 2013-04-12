@@ -135,7 +135,11 @@ public class MongoLoader extends LoadFunc implements LoadMetadata {
     			for(int j = 0; j < vals.size(); j++) {
     				t = tupleFactory.newTuple(fs.length);
     				for(int k = 0; k < fs.length; k++) {
-    					t.set(k, readField(((BasicDBObject)vals.get(j)).get(fs[k].getName()), fs[k]));
+				    String bagFieldName = fs[k].getName();
+				    if (bagFieldName.startsWith(MongoStorage.ESC_UNDERSCORE_PREFIX)) {
+					bagFieldName = bagFieldName.substring(MongoStorage.ESC_UNDERSCORE_PREFIX.length() - 1);
+				    }
+    				    t.set(k, readField(((BasicDBObject)vals.get(j)).get(bagFieldName), fs[k]));
     				}
     				bag.add(t);
     			}
